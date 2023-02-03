@@ -1,0 +1,11 @@
+package time-for-sleep
+
+authors = "Denis Buzdalov"
+license = "Apache-2.0"
+brief = "Some time type + interfaces for getting time and sleeping"
+
+version = 0.1.0
+
+sourcedir = "src"
+
+modules = System.Time

@@ -1,0 +1,8 @@
+[install]
+whitelist = [ "time-for-sleep-tests" ]
+
+[custom.all.time-for-sleep]
+type = "local"
+path = "."
+ipkg = "time-for-sleep.ipkg"
+test = "tests/tests.ipkg"
