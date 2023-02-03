@@ -1,6 +1,6 @@
 module System.Time
 
-import Data.Nat
+import public Data.Nat
 
 import System       -- for `sleep` for `IO` implementations
 import System.Clock -- for `clockTime` for `IO` implementations
