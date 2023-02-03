@@ -94,6 +94,10 @@ namespace FiniteDuration
     (.millis) = MkFinDuration
     (.asMillis) = millis
 
+  export %defaulthint
+  DefaultTimeValue : TimeValue FinDuration
+  DefaultTimeValue = %search
+
   export
   Eq FinDuration where
     (==) = (==) `on` (.asMillis)
