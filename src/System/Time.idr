@@ -123,6 +123,11 @@ namespace FiniteDuration
   (/) : FinDuration -> (z : Nat) -> (0 _ : NonZero z) => FinDuration
   d / z = (divNatNZ d.asMillis z %search).millis
 
+  -- Gives a zero length duration if longer duration is subtracted from a smaller one
+  export
+  (-) : FinDuration -> FinDuration -> FinDuration
+  x - y = (x.asMillis `minus` y.asMillis).millis
+
 ------------------------------------------------------------
 --- Operations between absolute time and finite duration ---
 ------------------------------------------------------------
