@@ -7,5 +7,6 @@ brief = "Some time type + interfaces for getting time and sleeping"
 version = 0.1.0
 
 sourcedir = "src"
+builddir = ".build"
 
 modules = System.Time
