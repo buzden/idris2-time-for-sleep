@@ -1,6 +1,3 @@
-[install]
-whitelist = [ "time-for-sleep-tests" ]
-
 [custom.all.time-for-sleep]
 type = "local"
 path = "."
