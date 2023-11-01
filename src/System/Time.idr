@@ -1,5 +1,7 @@
 module System.Time
 
+import Control.Monad.Trans
+
 import public Data.Nat
 
 import System       -- for `sleep` for `IO` implementations
@@ -156,6 +158,23 @@ interface Timed m => Monad m => CanSleep m where
 
   sleepFor : FinDuration -> m Unit
   sleepFor d = sleepTill $ !currentTime + d
+
+----------------------------------------
+--- Implementations for `MonadTrans` ---
+----------------------------------------
+
+namespace Timed
+
+  export
+  [Trans] Timed m => MonadTrans t => Monad m => Timed (t m) where
+    currentTime = lift currentTime
+
+namespace CanSleep
+
+  export
+  [Trans] CanSleep m => MonadTrans t => Monad m => Monad (t m) => CanSleep (t m) using Timed.Trans where
+    sleepFor  = lift . sleepFor
+    sleepTill = lift . sleepTill
 
 --------------------------------
 --- Implementations for `IO` ---
