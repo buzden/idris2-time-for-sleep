@@ -1,0 +1,7 @@
+package interpolation-tests-common
+
+builddir = ".build"
+
+depends = time-for-sleep
+
+modules = InterpolationsCommon

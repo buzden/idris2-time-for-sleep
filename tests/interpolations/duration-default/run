@@ -1,0 +1,6 @@
+rm -rf build/
+
+flock "$1" pack -q build test.ipkg && \
+build/exec/test
+
+rm -rf build/

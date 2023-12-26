@@ -3,6 +3,7 @@ module System.Time
 import Control.Monad.Trans
 
 import public Data.Nat
+import Data.String
 
 import System       -- for `sleep` for `IO` implementations
 import System.Clock -- for `clockTime` for `IO` implementations
@@ -142,6 +143,77 @@ x - y = ((x `max` y).asMillis `minus` (x `min` y).asMillis).millis
 export
 (+) : Time -> FinDuration -> Time
 t + d = (t.asMillis + d.asMillis).millis
+
+----------------------
+--- Interpolations ---
+----------------------
+
+timeComponent : UntypedTime -> (pre, descSg, descPl : String) -> List String
+timeComponent d pre descSg descPl = if d == 0 then [] else
+  ["\{pre}\{show d}\{if d == 1 then descSg else descPl}"]
+
+joinOr : (ifEmpty : String) -> List (List String) -> List String
+joinOr ifEmpty [] = [ ifEmpty ]
+joinOr _       xs = join xs
+
+ifNotNull : (List a -> List a) -> List a -> List a
+ifNotNull _ [] = []
+ifNotNull f xs = f xs
+
+stripFinZeros : String -> String
+stripFinZeros = pack . reverse . dropWhile (== '0') . reverse . unpack
+
+namespace FiniteDuration
+
+  export
+  [Wrds] Interpolation FinDuration where
+    interpolate tv = joinBy " " $ joinOr "0 sec"
+      [ timeComponent tv.daysComponent    "" " day"  " days"
+      , timeComponent tv.hoursComponent   "" " hr"   " hr"
+      , timeComponent tv.minutesComponent "" " min"  " min"
+      , timeComponent tv.secondsComponent "" " sec"  " sec"
+      , timeComponent tv.millisComponent  "" " ms"   " ms"
+      ]
+
+  export
+  [Words] Interpolation FinDuration where
+    interpolate tv = joinBy ", " $ joinOr "0 seconds"
+      [ timeComponent tv.daysComponent    "" " day"         " days"
+      , timeComponent tv.hoursComponent   "" " hour"        " hours"
+      , timeComponent tv.minutesComponent "" " minute"      " minutes"
+      , timeComponent tv.secondsComponent "" " second"      " seconds"
+      , timeComponent tv.millisComponent  "" " millisecond" " milliseconds"
+      ]
+
+  export
+  [Semicoloned] Interpolation FinDuration where
+    interpolate tv = concat $ do
+      let s  = tv.secondsComponent
+          ms = tv.millisComponent
+      timeComponent tv.daysComponent "" "d" "d" ++
+        [ padLeft 2 '0' $ show tv.hoursComponent
+        , ":"
+        , padLeft 2 '0' $ show tv.minutesComponent
+        ] ++ if s == 0 && ms == 0 then [] else
+          ":" :: padLeft 2 '0' (show s) :: (("." ++) . padLeft 3 '0' <$> timeComponent ms "" "" "")
+
+  export
+  [ISO8601] Interpolation FinDuration where
+    interpolate d = do
+      let date = [ timeComponent d.daysComponent "" "D" "D" ]
+      let time = ifNotNull (["T"]::)
+                   [ timeComponent d.hoursComponent   "" "H" "H"
+                   , timeComponent d.minutesComponent "" "M" "M"
+                   , let s  = d.secondsComponent
+                         ms = d.millisComponent
+                     in if s == 0 && ms == 0 then [] else
+                          show s :: (("." ++) . stripFinZeros . padLeft 3 '0'<$> timeComponent ms "" "" "") ++ ["S"]
+                   ]
+      strCons 'P' . concat . joinOr "T0S" $ date ++ time
+
+  export %defaulthint %inline
+  DefaultFinDurationInterpolation : Interpolation FinDuration
+  DefaultFinDurationInterpolation = Wrds
 
 ------------------
 --- Interfaces ---
