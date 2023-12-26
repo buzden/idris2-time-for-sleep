@@ -1,0 +1,7 @@
+package a-test
+
+depends = interpolation-tests-common
+
+executable = test
+
+main = TestInterpolation

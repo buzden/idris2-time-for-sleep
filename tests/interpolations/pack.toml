@@ -1,0 +1,4 @@
+[custom.all.interpolation-tests-common]
+type = "local"
+path = "common"
+ipkg = "common.ipkg"

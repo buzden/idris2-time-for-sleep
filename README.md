@@ -78,6 +78,58 @@ passedTime : (start, current : Time) -> FinDuration
 passedTime start current = current - start
 ```
 
+### Interpolation
+
+`Interpolation` interface is implemented for `FinDuration` data type.
+So, you can use it for printing meaningful text, say
+
+```idris
+errorMessage : FinDuration -> String
+errorMessage duration = "Error occurred after \{duration}"
+```
+
+<!-- idris
+main_errorMessageCorrect : IO Unit
+main_errorMessageCorrect = do
+  putStrLn $ errorMessage $ 3.minutes <+> 5.seconds
+-->
+
+There is a default interpolation which prints period in words, but tries to be short.
+Also, some non-default ones also exist, e.g.
+
+```idris
+log : FinDuration -> (msg : String) -> IO ()
+log d msg = do
+  let _ = ISO8601
+  putStrLn "\{d}: \{msg}"
+```
+
+Then call like
+
+<!-- idris
+main_printLog : IO Unit
+main_printLog = do {
+-->
+```idris
+log (3.minutes <+> 5.seconds) "start"
+```
+<!-- idris
+ }
+-->
+
+would print something like
+
+```console
+PT3M5S: start
+```
+
+Currently, several interpolation forms exist:
+
+- the default, `Wrds`: `3 min 5 sec`
+- `Words`: `3 minutes, 5 seconds`
+- `Semicoloned`: `00:03:05`
+- `ISO8601` (for periods): `PT3M5S`
+
 ## Interfaces
 
 For getting the current time in a context `m`, there is an interface `Timed m` which provides a function `currentTime`.
