@@ -2,6 +2,7 @@ module System.Time
 
 import Control.Monad.Trans
 
+import public Data.Fin
 import public Data.Nat
 import Data.String
 
@@ -34,11 +35,11 @@ interface TimeValue a where
   (.asDays)    : a -> UntypedTime
 
   -- appropriate components when we represent this time value as `DD HH:MM:SS.ms`
-  (.millisComponent)  : a -> UntypedTime
-  (.secondsComponent) : a -> UntypedTime
-  (.minutesComponent) : a -> UntypedTime
-  (.hoursComponent)   : a -> UntypedTime
-  (.daysComponent)    : a -> UntypedTime
+  (.millisComponent)  : a -> Fin 1000
+  (.secondsComponent) : a -> Fin 60
+  (.minutesComponent) : a -> Fin 60
+  (.hoursComponent)   : a -> Fin 24
+  (.daysComponent)    : a -> Nat
 
   x.seconds = (1000 * x).millis
   x.minutes = (60 * x).seconds
@@ -50,10 +51,10 @@ interface TimeValue a where
   x.asHours   = divNatNZ x.asMinutes 60   SIsNonZero
   x.asDays    = divNatNZ x.asHours   24   SIsNonZero
 
-  x.millisComponent  = modNatNZ x.asMillis  1000 SIsNonZero
-  x.secondsComponent = modNatNZ x.asSeconds 60   SIsNonZero
-  x.minutesComponent = modNatNZ x.asMinutes 60   SIsNonZero
-  x.hoursComponent   = modNatNZ x.asHours   24   SIsNonZero
+  x.millisComponent  = restrict _ $ cast x.asMillis
+  x.secondsComponent = restrict _ $ cast x.asSeconds
+  x.minutesComponent = restrict _ $ cast x.asMinutes
+  x.hoursComponent   = restrict _ $ cast x.asHours
   x.daysComponent    = x.asDays
 
 ---------------------
@@ -148,8 +149,8 @@ t + d = (t.asMillis + d.asMillis).millis
 --- Interpolations ---
 ----------------------
 
-timeComponent : UntypedTime -> (pre, descSg, descPl : String) -> List String
-timeComponent d pre descSg descPl = if d == 0 then [] else
+timeComponent : Cast v Nat => v -> (pre, descSg, descPl : String) -> List String
+timeComponent d pre descSg descPl = let d : Nat := cast d in if d == 0 then [] else
   ["\{pre}\{show d}\{if d == 1 then descSg else descPl}"]
 
 joinOr : (ifEmpty : String) -> List (List String) -> List String
@@ -270,8 +271,8 @@ namespace CanSleep
       usleep msComp
       where
         %inline
-        toIntWithPrf : Nat -> (x : Int ** So (x >= 0))
-        toIntWithPrf k = (cast k ** believe_me {- we are converting from `Nat` -} Oh)
+        toIntWithPrf : Fin 1000 -> (x : Int ** So (x >= 0))
+        toIntWithPrf k = (cast $ finToNat k ** believe_me {- we are converting from `Nat` -} Oh)
 
 export
 Timed IO where
