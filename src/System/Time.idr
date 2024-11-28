@@ -46,10 +46,10 @@ interface TimeValue a where
   x.hours   = (60 * x).minutes
   x.days    = (24 * x).hours
 
-  x.asSeconds = divNatNZ x.asMillis  1000 SIsNonZero
-  x.asMinutes = divNatNZ x.asSeconds 60   SIsNonZero
-  x.asHours   = divNatNZ x.asMinutes 60   SIsNonZero
-  x.asDays    = divNatNZ x.asHours   24   SIsNonZero
+  x.asSeconds = divNatNZ x.asMillis  1000 %search
+  x.asMinutes = divNatNZ x.asSeconds 60   %search
+  x.asHours   = divNatNZ x.asMinutes 60   %search
+  x.asDays    = divNatNZ x.asHours   24   %search
 
   x.millisComponent  = restrict _ $ cast x.asMillis
   x.secondsComponent = restrict _ $ cast x.asSeconds
