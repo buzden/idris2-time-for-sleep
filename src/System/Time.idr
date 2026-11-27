@@ -259,7 +259,8 @@ namespace Timed
   [HasIO] HasIO io => Timed io where
     currentTime = liftIO $ (.millis) . fromInteger . millisOfClock <$> clockTime UTC where
       millisOfClock : Clock _ -> Integer
-      millisOfClock (MkClock secs nanos) = secs * 1000 + nanos `div` 1000000
+      millisOfClock (MkClock secs nanos) =
+        secs * 1000 + nanos `div` 1000000 + (if nanos `mod` 1000000 >= 500000 then 1 else 0)
 
 namespace CanSleep
 
